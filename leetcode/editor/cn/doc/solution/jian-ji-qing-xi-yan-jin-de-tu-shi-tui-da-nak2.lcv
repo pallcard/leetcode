@@ -1,0 +1,181 @@
+# 原理
+
+重画链表如下所示，线上有若干个节点。记蓝色慢指针为 slow，红色快指针为 fast。初始时 slow 和 fast 均在头节点处。
+![0208_2.png](https://pic.leetcode.cn/1715514553-RxQrzr-0208_2.png)
+使 slow 和 fast 同时前进，fast 的速度是 slow 的两倍。当 slow 抵达环的入口处时，fast 一定在环上，如下所示。
+![0208_3.png](https://pic.leetcode.cn/1715514558-mCJsmw-0208_3.png)
+其中：
+- head 和 A 的距离为 $z$
+- 弧 AB (沿箭头方向) 的长度为 $x$
+- 同理，弧 BA 的长度为 $y$
+
+可得：
+- slow 走过的步数为 $z$
+- 设 fast 已经走过了 $k$ 个环，$k \geq 0$，对应的步数为 $z + k(x+y) + x$
+
+以上两个步数中，后者为前者的两倍，即 $2z = z + k(x+y) + x$
+化简可得 $z = x + k(x+y)$，替换如下所示。
+
+![0208_4.png](https://pic.leetcode.cn/1715514562-KmTrNr-0208_4.png)
+此时因为 fast 比 slow 快 1 个单位的速度，且 $y$ 为整数，所以再经过 $y$ 个单位的时间即可追上 slow。
+
+即 slow 再走 $y$ 步，fast 再走 $2y$ 步。设相遇在 C 点，位置如下所示，可得弧 AC 长度为 $y$。
+![0208_5.png](https://pic.leetcode.cn/1715514566-cEsEBC-0208_5.png)
+因为此前 $x + y$  为环长，所以弧 CA 的长度为 $x$。
+此时我们另用一橙色指针 ptr (pointer) 指向 head，如下所示。并使 ptr 和 slow 保持 1 个单位的速度前进，在经过 $z = x + k(x+y)$ 步后，可在 A 处相遇。
+![0208_6.png](https://pic.leetcode.cn/1715514569-ATwmZT-0208_6.png)
+再考虑链表无环的情况，fast 在追到 slow 之前就会指向空节点，退出循环即可。
+
+# 代码
+
+* []
+
+```C++
+class Solution {
+public:
+    ListNode* detectCycle(ListNode* head) {
+        ListNode* slow = head;
+        ListNode* fast = head;
+
+        // 此处如果用 while (fast != slow)，则在一开始时就违背了条件
+        // 也可用 do while, 但以下代码更符合 repeat until (重复直到) 的思考习惯
+        while (true) {
+            // 指向空节点，说明无环。
+            if (fast == nullptr || fast->next == nullptr)
+                return nullptr;
+
+            // fast 和 slow 异速前进
+            fast = fast->next->next;
+            slow = slow->next;
+
+            if (fast == slow) break; // fast 和 slow 相遇
+        }
+
+        // ptr 和 slow 同速前进，直至相遇在入口
+        ListNode* ptr = head;
+        while (ptr != slow) {
+            ptr = ptr->next;
+            slow = slow->next;
+        }
+
+        return ptr; // 返回入口节点
+    }
+};
+```
+
+* []
+
+```Python
+class Solution:
+    def detectCycle(self, head: ListNode) -> ListNode:
+        slow = head
+        fast = head
+
+        # 此处如果用 while (fast != slow)，则在一开始时就违背了条件
+        # 也可用 do while, 但以下代码更符合 repeat until (重复直到) 的思考习惯
+        while True:
+            # 指向空节点，说明无环。
+            if not fast or not fast.next:
+                return None
+
+            # fast 和 slow 异速前进
+            fast = fast.next.next
+            slow = slow.next
+
+            if fast == slow:
+                break  # fast 和 slow 相遇
+
+        # ptr 和 slow 同速前进，直至相遇在入口
+        ptr = head
+        while ptr != slow:
+            ptr = ptr.next
+            slow = slow.next
+
+        return ptr # 返回入口节点
+```
+
+* []
+
+```Java
+public class Solution {
+    public ListNode detectCycle(ListNode head) {
+        ListNode slow = head;
+        ListNode fast = head;
+
+        // 此处如果用 while (fast != slow)，则在一开始时就违背了条件
+        // 也可用 do while, 但以下代码更符合 repeat until (重复直到) 的思考习惯
+        while (true) {
+            // 指向空节点，说明无环。
+            if (fast == null || fast.next == null)
+                return null;
+
+            // fast 和 slow 异速前进
+            fast = fast.next.next;
+            slow = slow.next;
+
+            if (fast == slow) break; // fast 和 slow 相遇
+        }
+
+        // ptr 和 slow 同速前进，直至相遇在入口
+        ListNode ptr = head;
+        while (ptr != slow) {
+            ptr = ptr.next;
+            slow = slow.next;
+        }
+
+        return ptr; // 返回入口节点
+    }
+}
+```
+
+* []
+
+```Kotlin
+class Solution {
+    fun detectCycle(head: ListNode?): ListNode? {
+        var slow = head 
+        var fast = head 
+
+        // 此处如果用 while (fast != slow)，则在一开始时就违背了条件
+        // 也可用 do while, 但以下代码更符合 repeat until (重复直到) 的思考习惯
+        while(true){ 
+            // fast 和 slow 异速前进。fast 指向空节点时，说明无环
+            fast = fast?.next?.next ?: return null
+            slow = slow!!.next 
+
+            if(fast == slow) break // fast 和 slow 相遇
+        }
+
+        // ptr 和 slow 同速前进，直至相遇在入口
+        var ptr = head!!
+        while(ptr != slow){
+            ptr = ptr.next
+            slow = slow!!.next 
+        }
+
+        return ptr // 返回入口节点
+    } 
+}
+```
+
+# 复杂度
+
+时间：$\Theta(n)$
+- 如果不相交，fast 走过 $n$ 步即结束
+- 如果相交
+  - fast 和 slow 相遇时 slow 走过的距离 $\leq n$，所以 fast 走过的距离 $\leq 2n$
+  - ptr 走过的距离 $< n$
+  - slow 两次走过的距离之和 $\geq n$ 但 $<$ fast 和 ptr 走过的距离之和。
+    以上累计是恒定 $n$ 这个数量级，和不相交的情况相同，所以可写为更精确的 $\Theta(n)$。
+
+空间：$\Theta(1)$
+
+# 推广
+
+以下皆为个人所著，兼顾了职场面试和本硕阶段的学术考试。
+- [不同层次的面试算法学习规划](https://leetcode.cn/circle/discuss/xV68NV/)
+- [附个人题解的双指针题单](https://leetcode.cn/circle/discuss/BI95fj/)
+- [图论入门](https://leetcode.cn/leetbook/detail/introduction-to-graph/)
+- [图论进阶](https://leetcode.cn/leetbook/detail/advanced-graph-theory/)
+
+点赞关注不迷路，祝各位早日上岸，飞黄腾达！
