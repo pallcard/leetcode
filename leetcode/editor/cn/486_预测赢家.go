@@ -15,6 +15,10 @@ func predictTheWinner(nums []int) bool {
 		return true
 	}
 
+	if len(nums)%2 == 0 { //偶数堆必赢，可以先看把数字按照下标的奇偶分成两堆，如果下标奇数堆数值大，则每次选奇数堆
+		return true
+	}
+
 	dp := make([][][]int, len(nums))
 	for i := 0; i < len(nums); i++ {
 		dp[i] = make([][]int, len(nums))
