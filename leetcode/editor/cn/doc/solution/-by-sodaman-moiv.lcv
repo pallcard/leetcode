@@ -1,0 +1,102 @@
+算法思路和官解基本相同，只不过python没有内置的有序集合类，所以用哈希表代替实现了，代码如下：
+
+* 
+
+```
+class ExamRoom:
+
+    def __init__(self, n: int):
+        self._n = n
+        self._search = {-1: [-1, 0]}
+        self._h = []
+
+    def seat(self) -> int:
+        # 如果学生数为0
+        if len(self._search.keys()) == 1:
+            self._search[0] = [-1, self._n]
+            self._h = [(1 - self._n, 0, self._n)]
+            return 0
+        while True:
+            _, before, after = heapq.heappop(self._h)
+            # 一系列判断是否为无效区间(延迟删除)
+            if not before in self._search.keys() or not (after in self._search.keys() or after == self._n):
+                continue
+            if after == self._n:
+                inp = after - 1
+            elif before == -1:
+                inp = 0
+            else:
+                inp = (before + after) // 2
+            if inp in self._search.keys():
+                continue
+            break
+        self._search[before][1] = inp
+        if after in self._search.keys():
+            self._search[after][0] = inp
+        self._search[inp] = [before, after]
+        heapq.heappush(self._h, (-((inp - before) // 2), before, inp))
+        heapq.heappush(self._h, (-((after - inp) // 2), inp, after))
+        return inp
+
+    def leave(self, p: int) -> None:
+        before, after = self._search.pop(p)
+        self._search[before][1] = after
+        if after in self._search.keys():
+            self._search[after][0] = before
+        if after == self._n or before == -1:
+            heapq.heappush(self._h, (-(after - before - 1), before, after))
+        heapq.heappush(self._h, (-((after - before) // 2), before, after))
+
+```
+
+看官解之前自己写了个按序查找的，时间复杂度太高，卡在倒数第二个用例，有兴趣可以看看：
+
+* 
+
+```
+class ExamRoom:
+
+    def __init__(self, n: int):
+        self._n = n
+        self._search = {}
+        self._students = -1
+
+    def seat(self) -> int:
+        self._students += 1
+        # 如果学生数为0
+        if not self._students:
+            self._search = {-1: [-1, 0], 0: [-1, self._n]}
+            return 0
+        ans = a_pre = 0
+        m = pos = -1
+        while pos in self._search.keys():
+            pre, pos = pos, self._search[pos][1]
+            if pos == self._n:
+                inp = self._n - 1
+                gap = inp - pre - 1
+            elif pre == -1:
+                inp = 0
+                gap = pos - 1
+            else:
+                inp = (pos + pre) // 2
+                gap = inp - pre - 1
+            if gap > m:
+                m = gap
+                ans = inp
+                a_pre = pre
+        after = self._search[a_pre][1]
+        self._search[a_pre][1] = ans
+        if after in self._search.keys():
+            self._search[after][0] = ans
+        self._search[ans] = [a_pre, after]
+        return ans
+
+    def leave(self, p: int) -> None:
+        self._students -= 1
+        before, after = self._search.pop(p)
+        self._search[before][1] = after
+        if after in self._search.keys():
+            self._search[after][0] = before
+
+```
+

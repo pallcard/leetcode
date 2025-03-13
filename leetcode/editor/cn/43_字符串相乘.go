@@ -2,12 +2,56 @@ package main
 
 import (
 	"fmt"
+	"strings"
 )
 
 // leetcode submit region begin(Prohibit modification and deletion)
 func multiply(num1 string, num2 string) string {
 	// 123
 	// 456
+	//todo 关键：num1[i1]*num2[i2]的结果正好在下标的 i1+i2, i1+i2+1
+	/**
+			1  2  3
+		       4  5
+		-------------
+		       1  5
+		    1  0
+		 0  5
+		    1  2
+		 0  8
+	  0	 4
+	------------------
+	  0  5   5  3   5
+	i 0  1   2  3   4
+
+		**/
+
+	if num1 == "0" || num2 == "0" {
+		return "0"
+	}
+
+	m := len(num1)
+	n := len(num2)
+	res := make([]int, m+n)
+
+	for i := m - 1; i >= 0; i-- {
+		for j := n - 1; j >= 0; j-- {
+			n1 := int(num1[i] - '0')
+			n2 := int(num2[j] - '0')
+			sum := n1*n2 + res[i+j+1]
+			res[i+j+1] = sum % 10 // todo 地位 上一行以计算了低位
+			res[i+j] += sum / 10  // todo 高位 +=
+
+		}
+	}
+
+	numStr := strings.Builder{}
+	for i := 0; i < len(res); i++ {
+		numStr.WriteRune(rune(res[i] + '0'))
+	}
+	return strings.TrimLeft(numStr.String(), "0") //去除前缀0
+}
+func multiply2(num1 string, num2 string) string {
 
 	if num1 == "0" || num2 == "0" {
 		return "0"
@@ -77,5 +121,5 @@ func add(num1 string, num2 string) string {
 func main() {
 	s := add("123", "456")
 	fmt.Print(s)
-	multiply("123", "456")
+	multiply("123", "45")
 }

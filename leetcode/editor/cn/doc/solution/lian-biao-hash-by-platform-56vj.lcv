@@ -1,0 +1,91 @@
+* 
+
+```
+// 如果有有序集合这样的数据结构就可以完美解决了
+// 每次遍历集合找到空挡最大空挡的,安插在最大空挡的中间
+// golang里可以用list+map的方式, map用来加速leave,做到O(1)的复杂度
+    seated *list.List
+    n int
+    num2Ele map[int]*list.Element
+}
+
+
+func Constructor(n int) ExamRoom {
+    return ExamRoom{
+        seated: list.New(),
+        n: n,
+        num2Ele: make(map[int]*list.Element), // 不能直接预分配n的空间,会溢出. 理论上10^4就足够了
+    }
+}
+
+
+func (this *ExamRoom) Seat() int {
+    if this.seated.Len() == 0 {
+        ele := this.seated.PushFront(0)
+        this.num2Ele[0] = ele
+        return 0
+    }
+    if this.seated.Len() >= this.n {
+        return -1
+    }
+    prev := this.seated.Front()
+    var maxStart, maxEnd *list.Element
+    maxRange := 0
+    // 0号座位空着
+    if prev.Value.(int) != 0 {
+        maxRange = prev.Value.(int) * 2
+        maxEnd = prev
+    }
+    for prev != nil {
+        cur := prev.Next()
+        delta := (this.n -1 - prev.Value.(int))*2
+        if cur != nil {
+            delta = cur.Value.(int) - prev.Value.(int)
+        }
+        
+        if delta/2 > maxRange/2 { // 注意这里要做除2的动作, 计算真正的最小距离
+            maxStart, maxEnd = prev, cur
+            maxRange = delta
+        }
+        prev = cur
+    }
+    
+    var pos int
+    if maxStart != nil && maxEnd != nil {
+        pos = maxStart.Value.(int) + (maxEnd.Value.(int) - maxStart.Value.(int))/2
+    } else if  maxStart != nil {
+        pos = this.n-1
+    } else {
+        pos = 0
+    }
+    if pos == 0 {
+        ele := this.seated.PushFront(pos)
+        this.num2Ele[pos] = ele
+    } else {
+        ele := this.seated.InsertAfter(pos, maxStart)
+        this.num2Ele[pos] = ele
+    }
+
+    return pos
+}
+
+
+func (this *ExamRoom) Leave(p int)  {
+    ele := this.num2Ele[p]
+    if ele == nil {
+        fmt.Println(p)
+        return
+    }
+    delete(this.num2Ele, p)
+    this.seated.Remove(ele)
+}
+
+
+/**
+ * Your ExamRoom object will be instantiated and called as such:
+ * obj := Constructor(n);
+ * param_1 := obj.Seat();
+ * obj.Leave(p);
+ */
+```
+

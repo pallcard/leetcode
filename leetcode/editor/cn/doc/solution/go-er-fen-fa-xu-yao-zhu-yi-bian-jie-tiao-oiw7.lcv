@@ -1,0 +1,79 @@
+### 解题思路
+
+此处撰写解题思路
+
+### 代码
+
+* golang
+
+```golang
+type ExamRoom struct {
+    nums []int
+    n    int
+}
+
+
+func Constructor(N int) ExamRoom {
+    return ExamRoom{
+    	nums: make([]int,0),
+    	n: N,
+	}
+}
+
+
+func (this *ExamRoom) Seat() int {
+	if len(this.nums)==0{
+		this.nums = append(this.nums,0)
+		return 0
+	}
+	l,r:=1,this.n-1
+    ans:=0
+    for l<=r{
+    	mid:=(l+r)>>1
+		if doSeat(this.nums,this.n,mid,&ans){
+			l = mid+1
+		}else {
+			r = mid -1
+		}
+	}
+	this.nums = append(this.nums,ans)
+	sort.Ints(this.nums)
+	return ans
+}
+
+
+func (this *ExamRoom) Leave(p int)  {
+   k:=sort.SearchInts(this.nums,p)
+   this.nums = append(this.nums[:k],this.nums[k+1:]...)
+}
+
+func doSeat(nums []int,n,mid int,res *int) bool {
+	if nums[0]-mid>=0 {
+		*res = nums[0] - mid
+		return true
+	}
+	if len(nums)==1&&nums[0]+mid<n{
+		*res = nums[0] + mid
+		return true
+	}
+	for i:=1;i<len(nums);i++{
+   	   if nums[i]-nums[i-1]>=2*mid{
+   	   	   *res = nums[i-1]+mid
+   	   	   return true
+	   }
+    }
+    if n-nums[len(nums)-1]>=2*mid{
+		*res = nums[len(nums)-1]+mid
+		return true
+	}
+    return false
+}
+
+/**
+ * Your ExamRoom object will be instantiated and called as such:
+ * obj := Constructor(N);
+ * param_1 := obj.Seat();
+ * obj.Leave(p);
+ */
+```
+

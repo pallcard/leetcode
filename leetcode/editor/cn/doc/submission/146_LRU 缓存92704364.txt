@@ -1,0 +1,42 @@
+class LRUCache {
+
+
+    Queue<Integer> keyQueue = new LinkedList<>();
+    Map<Integer, Integer> kvMap = new HashMap<>();
+    int capacity = 0;
+
+    public LRUCache(int capacity) {
+        this.capacity = capacity;
+    }
+
+    public int get(int key) {
+        int value = -1;
+        if (kvMap.containsKey(key)) {
+            value = kvMap.get(key);
+            keyQueue.remove(key);
+            keyQueue.add(key);
+        }
+        return value;
+    }
+
+    public void put(int key, int value) {
+        if (kvMap.containsKey(key)) {
+            keyQueue.remove(key);
+        }
+        if (keyQueue.size() >= this.capacity) {
+            Integer poll = keyQueue.poll();
+            kvMap.remove(poll);
+        }
+        kvMap.put(key, value);
+        keyQueue.add(key);
+    }
+}
+
+/**
+ * Your LRUCache object will be instantiated and called as such:
+ * LRUCache obj = new LRUCache(capacity);
+ * int param_1 = obj.get(key);
+ * obj.put(key,value);
+ */
+//runtime:182 ms
+//memory:46.7 MB
