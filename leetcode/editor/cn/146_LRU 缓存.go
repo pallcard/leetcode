@@ -2,55 +2,56 @@ package main
 
 // leetcode submit region begin(Prohibit modification and deletion)
 type LRUCache struct {
-	KV       map[int]int //k:v
-	KArr     []int
-	Capacity int //容量
-	Count    int //当前数量
+	kv       map[int]int //k:v
+	k        []int
+	capacity int //容量
 }
 
 func Constructor(capacity int) LRUCache {
 	return LRUCache{
-		KV:       map[int]int{},
-		KArr:     make([]int, capacity, capacity),
-		Capacity: capacity,
+		kv:       map[int]int{},
+		k:        make([]int, capacity, capacity),
+		capacity: capacity,
 	}
 }
 
 func (this *LRUCache) Get(key int) int {
-	if v, ok := this.KV[key]; ok {
+	if v, ok := this.kv[key]; ok {
+		// get了，则把key移动到首位
 		keyIndex := 0
-		for i := this.Count - 1; i >= 0; i-- {
-			if key == this.KArr[i] {
+		for i := 0; i < len(this.k); i++ {
+			if key == this.k[i] {
 				keyIndex = i
 				continue
 			}
 		}
-		for i := keyIndex - 1; i >= 0; i-- {
-			this.KArr[i+1] = this.KArr[i]
-		}
-		this.KArr[0] = key
+		copy(this.k[1:keyIndex+1], this.k[0:keyIndex])
+		//for i := keyIndex - 1; i >= 0; i-- {
+		//	this.KArr[i+1] = this.KArr[i]
+		//}
+		this.k[0] = key
 		return v
 	}
 	return -1
 }
 
 func (this *LRUCache) Put(key int, value int) {
-	if this.Get(key) != -1 {
-		this.KV[key] = value
+	if len(this.k) == 0 {
+		this.k[0] = key
+		this.kv[key] = value
 		return
 	}
-	for i := this.Count - 1; i >= 0; i-- {
-		if i == this.Capacity-1 { //容量已满删除最后一个key
-			delete(this.KV, this.KArr[i])
-			continue
-		}
-		this.KArr[i+1] = this.KArr[i]
+
+	if this.Get(key) != -1 {
+		this.kv[key] = value
+		return
 	}
-	this.KV[key] = value
-	this.KArr[0] = key
-	if this.Count != this.Capacity {
-		this.Count++
-	}
+
+	delete(this.kv, this.k[len(this.k)-1])
+	copy(this.k[1:this.capacity], this.k[0:this.capacity-1])
+
+	this.kv[key] = value
+	this.k[0] = key
 }
 
 /**
@@ -62,5 +63,12 @@ func (this *LRUCache) Put(key int, value int) {
 //leetcode submit region end(Prohibit modification and deletion)
 
 func main() {
+	lru := Constructor(2)
+	lru.Put(2, 1)
+	lru.Put(2, 2)
+	lru.Get(2)
+	lru.Put(1, 1)
+	lru.Put(1, 4)
+	lru.Get(2)
 
 }
