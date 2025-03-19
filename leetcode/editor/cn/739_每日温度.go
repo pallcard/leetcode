@@ -38,6 +38,31 @@ func dailyTemperatures(temperatures []int) []int {
 
 }
 
+func dailyTemperatures3(temperatures []int) []int {
+	res := make([]int, len(temperatures))
+	// 初始化栈顶元素为第一个下标索引0
+	stack := []int{0}
+
+	for i := 1; i < len(temperatures); i++ {
+		top := stack[len(stack)-1]
+		if temperatures[i] < temperatures[top] {
+			stack = append(stack, i)
+		} else if temperatures[i] == temperatures[top] {
+			stack = append(stack, i)
+		} else {
+			for len(stack) != 0 && temperatures[i] > temperatures[top] {
+				res[top] = i - top
+				stack = stack[:len(stack)-1]
+				if len(stack) != 0 {
+					top = stack[len(stack)-1]
+				}
+			}
+			stack = append(stack, i)
+		}
+	}
+	return res
+}
+
 func dailyTemperatures2(temperatures []int) []int {
 
 	res := make([]int, 0)
@@ -65,6 +90,6 @@ func dailyTemperatures2(temperatures []int) []int {
 //leetcode submit region end(Prohibit modification and deletion)
 
 func main() {
-	temperatures := dailyTemperatures([]int{73, 74, 75, 71, 69, 72, 76, 73})
+	temperatures := dailyTemperatures3([]int{73, 74, 75, 71, 69, 72, 76, 73})
 	fmt.Print(temperatures)
 }
