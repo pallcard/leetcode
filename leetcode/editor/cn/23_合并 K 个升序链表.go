@@ -123,8 +123,3 @@ func genListByArr(arr []int) *ListNode {
 	}
 	return virtualHead.Next
 }
-
-type ListNode struct {
-	Val  int
-	Next *ListNode
-}

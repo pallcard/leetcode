@@ -2,18 +2,20 @@ package main
 
 // leetcode submit region begin(Prohibit modification and deletion)
 func moveZeroes(nums []int) {
+
+	// todo 把非0元素和前面0元素交换,
 	if len(nums) == 0 {
 		return
 	}
 
-	left := 0
+	left := 0 //todo 0的元素的下标
 	for left < len(nums) && nums[left] != 0 {
 		left++
 	}
 
-	for i := left+1; i < len(nums); i++ {
+	for i := left + 1; i < len(nums); i++ {
 		if nums[i] != 0 {
-			nums[i], nums[left] = nums[left],nums[i]
+			nums[i], nums[left] = nums[left], nums[i]
 			left++
 		}
 	}
