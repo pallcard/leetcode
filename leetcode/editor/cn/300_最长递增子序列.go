@@ -6,7 +6,8 @@ import (
 
 // leetcode submit region begin(Prohibit modification and deletion)
 func lengthOfLIS2(nums []int) int {
-	// todo dp[i] : 以i结尾的最长的递增子序列
+	//todo dp[i] : 以i结尾的最长的递增子序列长度
+	// dp[i] = max(dp[j]+1) && nums[i]>nums[j]      j= i-1, i-2, ...
 
 	if len(nums) == 0 {
 		return 0
